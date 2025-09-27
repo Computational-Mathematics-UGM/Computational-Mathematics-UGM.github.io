@@ -1,0 +1,60 @@
+- name: Prof. Dr. Imam Solekhudin
+  nick: imam
+  url: /people/imam/
+  img: /assets/img/imam.jpg
+  bio: boundary element methods, inverse problems, fluid dynamics, wave propagation.
+  expertise: Expertise in boundary element methods, inverse problems, fluid dynamics, wave propagation.
+  students:
+    - name: Dr. Ivan Luthfi
+      thesis: "Boundary Element Method for Solving Two-Dimensional Incompressible Viscous Flows"
+    - name: Dr. Ari Dwi Hartanto
+      thesis: "A Boundary Integral Method for Solving Two-Dimensional Incompressible Viscous Flows"
+    - name: Zenith Purisha, PhD.
+      thesis: "A Fast Direct Solver for the Two-Dimensional Incompressible Stokes Equations"
+    - name: Rudi A. Prihandoko, M.Si.
+      thesis: "High-Order Finite Difference Methods for Wave Propagation Problems Using Dual-Pairing Summation-by-Parts Operators"
+
+- name: Dr. Sumardi
+  nick: mardi
+  url: /people/sumardi/
+  img: /assets/img/sumardi.jpg
+  bio: finite difference methods, numerical linear algebra, scientific computing.
+  expertise: Expertise in boundary methods, inverse problems, fluid dynamics, wave propagation.
+
+- name: Zenith Purisha, PhD. 
+  nick: zenith
+  url: /people/zenith/
+  img: /assets/img/zenith.jpg
+  bio: inverse problems, numerical linear algebra, scientific computing, image processing.
+  expertise: Expertise in inverse problems, numerical linear algebra, scientific computing, image processing.
+
+- name: Dr. Ari Dwi Hartanto
+  nick: ari
+  url: /people/ari/
+  img: /assets/img/ari.jpg
+  bio: boundary element methods, inverse problems, fluid dynamics, wave propagation.
+  expertise: Expertise in boundary element methods, inverse problems, fluid dynamics, wave propagation.
+
+- name: Rudi A. Prihandoko, M.Si.
+  nick: rudi
+  url: /people/rudi/
+  img: /assets/img/rudi.jpg
+  bio: SBP-SAT methods, high order methods, wave propagation, hyperbolic PDEs, numerical simulations.
+  expertise: Expertise in SBP-SAT methods, high order methods, wave propagation, hyperbolic PDEs, numerical simulations.
+  students:
+    - name: Dr. Ivan Luthfi
+      thesis: "Boundary Element Method for Solving Two-Dimensional Incompressible Viscous Flows"
+      year: 2020
+    - name: Dr. Ari Dwi Hartanto
+      thesis: "A Boundary Integral Method for Solving Two-Dimensional Incompressible Viscous Flows"
+      year: 2021
+    - name: Rudi A. Prihandoko, M.Si.
+      thesis: "High-Order Finite Difference Methods for Wave Propagation Problems Using Dual-Pairing Summation-by-Parts Operators"
+      year: 2022
+
+- name: Dr. Ivan Luthfi
+  nick: ivan
+  url: /people/ivan/
+  img: /assets/img/ivan.jpg
+  bio: boundary element methods, inverse problems, fluid dynamics, wave propagation.
+  expertise: Expertise in boundary element methods, inverse problems, fluid dynamics, wave propagation.

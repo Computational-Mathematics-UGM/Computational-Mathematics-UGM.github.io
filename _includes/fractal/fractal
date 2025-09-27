@@ -1,0 +1,283 @@
+<script>
+    /*
+    Fractal Hero Script
+    - Default: animated Julia set
+    - Interactions:
+        * Move mouse to change Julia parameter (when TYPE === 'julia')
+        * Click + drag to pan
+        * Scroll to zoom
+        * Double-click to reset view
+    - NOTE: Change TYPE to 'mandelbrot' to render the Mandelbrot set instead.
+    */
+
+    (() => {
+    const canvas = document.getElementById('fractal-canvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    // ---------- Config ----------
+    const TYPE = 'julia'; // 'julia' or 'mandelbrot'
+    let maxIterations = 300;       // increase for more detail (slow)
+    const animate = true;          // animate Julia's parameter c
+    const animationSpeed = 0.3;    // lower -> slower
+    const palette = makePalette(); // color palette function
+
+    // ---------- State ----------
+    let width = 0, height = 0;
+    let scale = 3.0;               // fractal "span" in complex plane
+    let centerX = 0.0, centerY = 0.0;
+    let dpr = Math.max(window.devicePixelRatio || 1, 1);
+    let isDragging = false;
+    let dragStart = null;
+    let viewStart = null;
+
+    // Julia param (c = cx + i*cy)
+    let juliaCx = -0.8, juliaCy = 0.156;
+    let time = 0;
+
+    // Performance: reduce iterations when hero is small
+    function adjustForSize() {
+        const area = width * height;
+        if (area < 400 * 300) maxIterations = 200;
+        else if (area < 1000 * 600) maxIterations = 300;
+        else maxIterations = 420;
+    }
+
+    // Resize canvas to fit container with proper device pixel ratio
+    function resize() {
+        const rect = canvas.getBoundingClientRect();
+        width = Math.floor(rect.width);
+        height = Math.floor(rect.height);
+        dpr = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = Math.max(1, Math.floor(width * dpr));
+        canvas.height = Math.max(1, Math.floor(height * dpr));
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale drawing to CSS pixels
+        adjustForSize();
+    }
+
+    // Convert pixel coordinates to complex plane coords
+    function pixelToComplex(px, py) {
+        // map px in [0,width) to real in [centerX - scale*aspect/2, centerX + ...]
+        const aspect = width / height;
+        const real = centerX + ( (px / width - 0.5) * scale * aspect );
+        const imag = centerY + ( (py / height - 0.5) * scale );
+        return { real, imag };
+    }
+
+    // Smooth iteration count for nicer colors
+    function mandelbrotEscapeCount(cr, ci, maxIter) {
+        let zr = 0, zi = 0;
+        let iter = 0;
+        while (zr*zr + zi*zi <= 4 && iter < maxIter) {
+        const tmp = zr*zr - zi*zi + cr;
+        zi = 2*zr*zi + ci;
+        zr = tmp;
+        iter++;
+        }
+        if (iter === maxIter) return maxIter;
+        // smoothing
+        const r2 = zr*zr + zi*zi;
+        const nu = Math.log(Math.log(r2) / Math.log(2)) / Math.log(2);
+        return iter + 1 - nu;
+    }
+
+    function juliaEscapeCount(zr, zi, cr, ci, maxIter) {
+        let iter = 0;
+        while (zr*zr + zi*zi <= 4 && iter < maxIter) {
+        const tmp = zr*zr - zi*zi + cr;
+        zi = 2*zr*zi + ci;
+        zr = tmp;
+        iter++;
+        }
+        if (iter === maxIter) return maxIter;
+        const r2 = zr*zr + zi*zi;
+        const nu = Math.log(Math.log(r2) / Math.log(2)) / Math.log(2);
+        return iter + 1 - nu;
+    }
+
+    // Main render function: writes directly into ImageData for speed
+    function renderToCanvas() {
+        const img = ctx.createImageData(width, height);
+        const data = img.data;
+        const aspect = width / height;
+        const invW = 1 / width, invH = 1 / height;
+
+        for (let py = 0; py < height; py++) {
+        for (let px = 0; px < width; px++) {
+            const idx = (py * width + px) * 4;
+            // map to complex plane
+            const real = centerX + ( (px * invW - 0.5) * scale * aspect );
+            const imag = centerY + ( (py * invH - 0.5) * scale );
+            let t;
+            if (TYPE === 'mandelbrot') {
+            t = mandelbrotEscapeCount(real, imag, maxIterations);
+            } else { // julia
+            t = juliaEscapeCount(real, imag, juliaCx, juliaCy, maxIterations);
+            }
+            // color mapping
+            const color = palette(t, maxIterations);
+            data[idx]   = color[0]; // r
+            data[idx+1] = color[1]; // g
+            data[idx+2] = color[2]; // b
+            data[idx+3] = 255;      // a
+        }
+        }
+        ctx.putImageData(img, 0, 0);
+    }
+
+    // Animation loop
+    let rafId = null;
+    function loop(now) {
+        if (typeof now === 'number') {
+        time = now / 1000;
+        }
+        // Update Julia parameter slowly when animating
+        if (TYPE === 'julia' && animate) {
+        // a gentle Lissajous-ish movement for c
+        juliaCx = -0.8 + 0.3 * Math.cos(time * animationSpeed * 0.6);
+        juliaCy =  0.156 + 0.3 * Math.sin(time * animationSpeed * 0.8);
+        }
+        renderToCanvas();
+        rafId = requestAnimationFrame(loop);
+    }
+
+    // Controls
+    canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = Math.sign(e.deltaY);
+        // zoom multiply factor
+        const zoomFactor = delta > 0 ? 1.12 : 1 / 1.12;
+        // zoom towards mouse position
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        const { real: mxR, imag: mxI } = pixelToComplex(mx, my);
+        // update center so that the point under the mouse stays fixed
+        centerX = mxR + (centerX - mxR) * zoomFactor;
+        centerY = mxI + (centerY - mxI) * zoomFactor;
+        scale *= zoomFactor;
+        // adapt iterations a little when zooming in/out
+        maxIterations = Math.min(1500, Math.max(50, Math.floor(maxIterations * (zoomFactor > 1 ? 0.95 : 1.05))));
+        // immediate render
+        renderToCanvas();
+    }, { passive: false });
+
+    canvas.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        dragStart = { x: e.clientX, y: e.clientY };
+        viewStart = { centerX, centerY };
+        canvas.setPointerCapture(e.pointerId);
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        // Move mouse to control julia parameter (when not dragging)
+        if (TYPE === 'julia' && !isDragging) {
+        // map mouse to small range for c parameter
+        const nx = (mx / width - 0.5) * 2;
+        const ny = (my / height - 0.5) * 2;
+        juliaCx = -0.8 + nx * 0.6;
+        juliaCy =  0.156 + ny * 0.6;
+        // we don't force a render here because loop runs; but if not animating, trigger render
+        if (!animate) renderToCanvas();
+        }
+
+        if (isDragging) {
+        const dx = e.clientX - dragStart.x;
+        const dy = e.clientY - dragStart.y;
+        // map pixels back to complex plane movement
+        const aspect = width / height;
+        centerX = viewStart.centerX - dx / width * scale * aspect;
+        centerY = viewStart.centerY - dy / height * scale;
+        renderToCanvas(); // immediate feedback while dragging
+        }
+    });
+
+    canvas.addEventListener('pointerup', (e) => {
+        isDragging = false;
+        dragStart = null;
+        viewStart = null;
+        try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    canvas.addEventListener('dblclick', () => {
+        // reset
+        centerX = 0; centerY = 0; scale = 3.0;
+        maxIterations = 300;
+        renderToCanvas();
+    });
+
+    // Pause animation when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+        } else if (!rafId) {
+        rafId = requestAnimationFrame(loop);
+        }
+    });
+
+    // Handle resize and set initial values
+    function init() {
+        resize();
+        // nice initial framing depending on type
+        if (TYPE === 'mandelbrot') {
+        centerX = -0.6; centerY = 0;
+        scale = 3.2;
+        } else {
+        centerX = 0; centerY = 0;
+        scale = 3.0;
+        }
+        // Kick off animation/render loop
+        if (!rafId) rafId = requestAnimationFrame(loop);
+    }
+
+    // Keep responsive
+    new ResizeObserver(resize).observe(canvas);
+    window.addEventListener('load', init);
+    window.addEventListener('orientationchange', resize);
+    window.addEventListener('resize', resize);
+
+    // ---------- Utility: palette ----------
+    // returns function(t, maxIter) -> [r,g,b]
+    function makePalette() {
+        // create gradient palette as array
+        const stops = [
+        { pos: 0.0, col: [10, 7, 25] },
+        { pos: 0.16, col: [55,  0, 75] },
+        { pos: 0.42, col: [180, 30, 120] },
+        { pos: 0.642, col: [255, 140, 60] },
+        { pos: 0.857, col: [250, 250, 120] },
+        { pos: 1.0, col: [255, 255, 255] }
+        ];
+        // linear interpolate between stops
+        return (t, maxIter) => {
+        if (t >= maxIter) return [10, 10, 12]; // interior (black-ish)
+        const v = t / maxIter;
+        // apply slight gamma/exponent for nicer distribution
+        const w = Math.pow(v, 0.6);
+        // find two stops
+        let a = stops[0], b = stops[stops.length - 1];
+        for (let i = 0; i < stops.length - 1; i++) {
+            if (w >= stops[i].pos && w <= stops[i + 1].pos) {
+            a = stops[i]; b = stops[i + 1]; break;
+            }
+        }
+        const span = (b.pos - a.pos) || 1e-6;
+        const t0 = (w - a.pos) / span;
+        const r = Math.round(a.col[0] + (b.col[0] - a.col[0]) * t0);
+        const g = Math.round(a.col[1] + (b.col[1] - a.col[1]) * t0);
+        const bl = Math.round(a.col[2] + (b.col[2] - a.col[2]) * t0);
+        return [r, g, bl];
+        };
+    }
+
+    // Initial call (in case load already happened)
+    if (document.readyState === 'complete') init();
+
+    })();
+</script>

@@ -1,0 +1,20 @@
+name: Computational Mathematics Research Group
+description: >-
+  Unofficial webpage for mathematical computation group research in 
+  computational mathematics, numerical analysis, and scientific computing.
+
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+title-short: CompMath
+
+
+# plugins:
+#   - jekyll-scholar
+
+# scholar:
+#   style: apa
+#   locale: en
+#   source: ./_bibliography
+#   bibliography: references.bib
+#   sort_by: year, month # or author, date, etc.
+#   order: descending # or ascending

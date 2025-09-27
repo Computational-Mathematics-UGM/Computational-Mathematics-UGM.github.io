@@ -1,0 +1,113 @@
+---
+layout: default
+---
+
+{% include header2.html %}
+<div class="card card-body blur shadow-blur mx-3 mx-md-4 mt-n6 mb-4">
+    <!-- START Testimonials w/ user image & text & info -->
+    <section class="py-sm-7 py-5 position-relative">
+        <div class="container">
+        <div class="row">
+            <div class="col-12 mx-auto">
+            <div class="row py-5">
+                <div class="col-lg-7 col-md-7 z-index-2 position-relative px-md-2 px-sm-5 mx-auto">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h3 class="mb-0">{{ page.author }}</h3>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-auto">
+                    <span class="h6">323</span>
+                    <span>Paper</span>
+                    </div>
+                    <div class="col-auto">
+                    <span class="h6">3.5k</span>
+                    <span>Citation</span>
+                    </div>
+                    <div class="col-auto">
+                    <span class="h6">260</span>
+                    <span>H-index</span>
+                    </div>
+                </div>
+                <p class="text-lg mb-0">
+                    <!-- {{ page.bio }} <br> -->
+                    {{ content }}
+                </p>
+                <h5 class="mt-5">Research Interest</h5>
+                <p>
+                    {{ page.keywords }}
+                </p>
+                <h5 class="mt-5">Publications</h5>
+                <ul>
+                </ul>
+
+                {% assign person = site.data.people | where: "nick", page.nick | first %}
+                {% if person and person.students %}
+                <h5 class="mt-5">Students</h5>
+                <ul>
+                    {% for student in person.students %}
+                    <li>
+                        {{ student.name }}. {{ student.year }}. {{ student.thesis }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                
+
+                {% for post in site.posts limit:3 %}
+                    {% if post.author == page.author %}
+                    <div class="col-lg-7 col-md-7 z-index-2 position-relative px-md-2 px-sm-5 mx-auto">
+                        <h5 class="mb-5">Also from this author</h5>
+                        <ul>
+                            <li>
+                                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                                <br>
+                                <small>({{ post.date | date: "%b %-d, %Y" }})</small>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- <div class="row py-5">
+                {% for post in site.posts limit:3%}
+                    {% if post.author == page.author %}
+                        <div class="col-lg-3 col-sm-6">
+                        <div class="card card-plain">
+                            <div class="card-header p-0 position-relative">
+                            <a class="d-block blur-shadow-image">
+                                {% if post.thumbnail %}
+                                    <img src="{{ post.thumbnail | relative_url }}" alt="{{ post.title }}" class="img-fluid shadow border-radius-lg" loading="lazy">
+                                {% endif %}
+                            </a>
+                            </div>
+                            <div class="card-body px-0">
+                            <h5>
+                                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                            </h5>
+                            <p>
+                                <small>({{ post.date | date: "%b %-d, %Y" }})</small>
+                                {{ post.content | strip_html | truncatewords: 30 }}
+                            </p>
+                            <a href="{{ post.url | relative_url }}" class="text-info text-sm icon-move-right">Read More
+                                <i class="fas fa-arrow-right text-xs ms-1"></i>
+                            </a>
+                            </div>
+                        </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div> -->
+            </div>
+        </div>
+        </div>
+    </section>
+    <!-- END Testimonials w/ user image & text & info -->
+    <!-- START Blogs w/ 4 cards w/ image & text & link -->
+    <section class="py-3">
+        <div class="container">
+
+        </div>
+    </section>
+    <!-- END Blogs w/ 4 cards w/ image & text & link -->
+</div>
