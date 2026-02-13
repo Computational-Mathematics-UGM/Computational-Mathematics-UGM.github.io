@@ -1,2 +1,1 @@
-# Computational-Mathematics-UGM.github.io
-Computational Mathematics UGM Website
+# mathematical-computation.github.io

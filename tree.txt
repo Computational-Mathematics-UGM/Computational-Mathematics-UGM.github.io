@@ -1,0 +1,39 @@
+academic-dept-site/
+│
+├── _config.yml
+├── Gemfile
+├── package.json
+├── tailwind.config.js
+├── index.md
+├── people.md
+├── about.md
+├── publications.md
+│
+├── _layouts/
+│   ├── default.html
+│   ├── home.html
+│   ├── page.html
+│   ├── person.html
+│   └── publications.html
+│
+├── _includes/
+│   ├── header.html
+│   └── footer.html
+│
+├── _people/
+│   ├── alice.md
+│   ├── bob.md
+│   └── carol.md
+│
+├── _bibliography/
+│   └── references.bib
+│
+├── assets/
+│   ├── css/
+│   │   ├── style.css   # Tailwind entry
+│   │   └── main.css    # Compiled output
+│   └── img/
+│       └── people/
+│           ├── alice.jpg
+│           ├── bob.jpg
+│           └── carol.jpg

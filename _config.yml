@@ -1,20 +1,34 @@
-name: Computational Mathematics Research Group
-description: >-
-  Unofficial webpage for mathematical computation group research in 
-  computational mathematics, numerical analysis, and scientific computing.
+title: "Department of Computational Science"
+description: "Academic Group Website"
+baseurl: "" # for GitHub Pages repo, set to /repo-name
+url: ""     # set your site URL here
 
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-title-short: CompMath
+theme: minima
 
+collections:
+  people:
+    output: true
+    permalink: /people/:name/
 
-# plugins:
-#   - jekyll-scholar
+plugins:
+  - jekyll-scholar
 
-# scholar:
-#   style: apa
-#   locale: en
-#   source: ./_bibliography
-#   bibliography: references.bib
-#   sort_by: year, month # or author, date, etc.
-#   order: descending # or ascending
+scholar:
+  style: apa
+  locale: en
+  source: ./_bibliography
+  bibliography: references.bib
+  bibliography_template: bib
+
+markdown: kramdown
+highlighter: rouge
+
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter_opts:
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+
